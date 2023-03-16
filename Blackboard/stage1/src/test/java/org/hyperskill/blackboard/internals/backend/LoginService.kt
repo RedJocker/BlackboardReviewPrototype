@@ -4,6 +4,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.mindrot.jbcrypt.BCrypt
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.util.*
 
 class LoginService(val moshi: Moshi) {
 
@@ -12,6 +16,12 @@ class LoginService(val moshi: Moshi) {
         String::class.java,
         String::class.java
     )
+
+    val base64Pass: String = MessageDigest.getInstance("SHA-256")
+        .digest("1234".toByteArray(StandardCharsets.UTF_8)).let {
+            Base64.getEncoder().encodeToString(it)
+        }
+
 
     fun serve(request: RecordedRequest): MockResponse {
 
@@ -22,23 +32,23 @@ class LoginService(val moshi: Moshi) {
 
             val pass = mapBody?.get("pass")
 
-            when(pass) {
-                null -> { // Bad Request
-                    println("mock 400")
-                    return MockResponse()
-                        .setResponseCode(400)
-                }
-                "1234" -> { // Ok
+            return if (pass == null) { // Bad Request
+                println("mock 400")
+                MockResponse()
+                    .setResponseCode(400)
+            }
+            else {
+                if (BCrypt.checkpw(base64Pass, pass)) { // Ok
                     println("mock 200")
-                    return MockResponse()
+                    MockResponse()
                         .setBody("{\"token\": \"abc\"}")
                         .setResponseCode(200)
                         .addHeader("Content-Type", "application/json")
-                }
-                else -> { // Unauthorized
+                } else {
                     println("mock 401")
-                    return MockResponse()
-                        .setResponseCode(401)
+                    MockResponse()
+                        .setBody("Wrong pass $pass")
+                        .setStatus("HTTP/1.1 401 Unauthorized")
                 }
             }
         }

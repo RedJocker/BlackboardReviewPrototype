@@ -33,12 +33,14 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
     lateinit var mockWebServer: MockWebServer
     lateinit var baseUrlMockWebServer: String
+    lateinit var blackBoardMockBackEnd: BlackBoardMockBackEnd
 
 
     @Before
     fun setUp() {
         mockWebServer = MockWebServer()
-        mockWebServer.dispatcher = BlackBoardMockBackEnd()
+        blackBoardMockBackEnd = BlackBoardMockBackEnd()
+        mockWebServer.dispatcher = blackBoardMockBackEnd
         baseUrlMockWebServer = mockWebServer.url("/").toString()
     }
 
@@ -48,7 +50,7 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
     }
 
     @Test
-    fun testSomething() {
+    fun testCorrectPasswordProduces200OkOnBackendResponse() {
 
         val arg = Intent().apply {
             putExtra("baseUrl", baseUrlMockWebServer)
@@ -63,12 +65,18 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
             assertEquals("Wrong request method", "POST", request.method)
             assertEquals("Wrong request path", "/login/", request.path)
 
-            println("before sleep")
-            Thread.sleep(100) // Dispatcher.dispatch and Callback.onResponse are async
-            println("after sleep")
-            shadowLooper.runToEndOfTasks()  // runOnUiThread goes to Handler queue
-            println("after runToEndOfTasks")
-            assertEquals("Wrong text", "{\"token\": \"abc\"}", helloTv.text.toString())
+            val response = blackBoardMockBackEnd.poolResponse()
+
+            if(response.status != "HTTP/1.1 200 OK") {
+                throw AssertionError(
+                    "Wrong status '${response.status}' with body '${response.getBody()?.readUtf8()}'"
+                )
+            } else {
+                Thread.sleep(50)           // Callback.onResponse is async
+                shadowLooper.runToEndOfTasks()  // runOnUiThread goes to Handler queue
+                println("after runToEndOfTasks")
+                assertEquals("Wrong text", "{\"token\": \"abc\"}", helloTv.text.toString())
+            }
         }
     }
 }

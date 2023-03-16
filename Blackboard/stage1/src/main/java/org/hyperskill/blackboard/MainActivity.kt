@@ -9,7 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
+import org.mindrot.jbcrypt.BCrypt
 import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +42,14 @@ class MainActivity : AppCompatActivity() {
     private fun onLoginSubmit(v: View?) {
         println("onLoginSubmit")
         blackboardClient.apply {
-            call = client.newCall(simpleTestPostRequest("login/", passEt.text.toString()))
+            val rawPass = passEt.text.toString()
+            val rawPassBytes = rawPass.toByteArray(StandardCharsets.UTF_8)
+            val messageDigest = MessageDigest.getInstance("SHA-256")
+            val sha256HashPass = messageDigest.digest(rawPassBytes)
+            val base64sha256HashPass = Base64.getEncoder().encodeToString(sha256HashPass)
+            val bcryptHashPass = BCrypt.hashpw(base64sha256HashPass, BCrypt.gensalt(4))
+
+            call = client.newCall(simpleTestPostRequest("login/", bcryptHashPass))
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("onFailure")
