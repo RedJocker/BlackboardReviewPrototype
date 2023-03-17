@@ -14,7 +14,7 @@
         android:layout_margin="8dp"
         android:gravity="center"
         android:text="hello new project"
-        app:layout_constraintBottom_toTopOf="@+id/inputEt"
+        app:layout_constraintBottom_toTopOf="@+id/usernameEt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,17 +23,32 @@
 
 
     <EditText
-        android:id="@+id/inputEt"
+        android:id="@+id/usernameEt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:gravity="center"
-        android:hint="change text"
+        android:hint="username"
         android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/passEt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/helloTv"
+        />
+
+    <EditText
+        android:id="@+id/passEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:hint="pass"
+        android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/submitBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/helloTv" />
+        app:layout_constraintTop_toBottomOf="@+id/usernameEt"
+        />
 
     <Button
         android:id="@+id/submitBtn"
@@ -43,7 +58,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputEt" />
+        app:layout_constraintTop_toBottomOf="@+id/passEt"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -37,4 +37,12 @@ dependencies {
     def navigationVersion = '2.4.2'
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
+
+    implementation "com.squareup.moshi:moshi-kotlin:1.11.0"
+
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.10.0"
+
+    testImplementation 'com.auth0:java-jwt:4.3.0'
 }
