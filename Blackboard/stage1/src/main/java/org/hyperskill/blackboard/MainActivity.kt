@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
-import org.mindrot.jbcrypt.BCrypt
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -19,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var helloTv : TextView
     lateinit var passEt : EditText
+    lateinit var usernameEt : EditText
     lateinit var button: Button
     lateinit var blackboardClient: BlackBoardClient
     lateinit var call: Call
@@ -27,8 +27,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         helloTv = findViewById(R.id.helloTv)
-        passEt = findViewById(R.id.inputEt)
+        passEt = findViewById(R.id.passEt)
         button = findViewById(R.id.submitBtn)
+        usernameEt = findViewById(R.id.usernameEt)
 
         blackboardClient = (application as BlackboardApplication).blackboardClient.apply {
             baseurl = intent.extras?.getString("baseUrl") ?: baseurl
@@ -42,14 +43,14 @@ class MainActivity : AppCompatActivity() {
     private fun onLoginSubmit(v: View?) {
         println("onLoginSubmit")
         blackboardClient.apply {
+            val username = usernameEt.text.toString()
             val rawPass = passEt.text.toString()
             val rawPassBytes = rawPass.toByteArray(StandardCharsets.UTF_8)
             val messageDigest = MessageDigest.getInstance("SHA-256")
             val sha256HashPass = messageDigest.digest(rawPassBytes)
             val base64sha256HashPass = Base64.getEncoder().encodeToString(sha256HashPass)
-            val bcryptHashPass = BCrypt.hashpw(base64sha256HashPass, BCrypt.gensalt(4))
 
-            call = client.newCall(simpleTestPostRequest("login/", bcryptHashPass))
+            call = client.newCall(loginRequest(username, base64sha256HashPass))
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("onFailure")
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         println("onResponse $body")
                         helloTv.text = body
+                        //helloTv.text = "{\"tok\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVEVBQ0hFUiIsInN1YiI6Ikdlb3JnZSIsImlzcyI6ImJsYWNrQm9hcmRBcHAifQ.hY4fC9rkQniZMmSIREK9esqUpxK187gkEgJl4pgt_iA\", \"role\": \"TEACHER\", \"extra\": \"hey\"}"
                     }
                 }
             })

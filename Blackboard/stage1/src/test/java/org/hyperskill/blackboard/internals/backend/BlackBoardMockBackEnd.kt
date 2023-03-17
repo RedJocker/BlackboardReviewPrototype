@@ -1,53 +1,54 @@
 package org.hyperskill.blackboard.internals.backend
 
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.hyperskill.blackboard.internals.backend.service.LoginService
 
-class BlackBoardMockBackEnd : Dispatcher() {
-    val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
 
-    val loginService = LoginService(moshi)
 
-    val resposeList = mutableListOf<MockResponse>()
+    private val loginService = LoginService(moshi)
+    private val responseList = mutableListOf<MockResponse>()
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         println("dispatch $request")
+        return controller(request).also {
+            responseList.add(it)
+        }
+    }
+
+    fun controller(request: RecordedRequest): MockResponse {
         return when (request.path) {
-            "/login/" , "/login" -> {
+            "/login/" -> {
                 loginService.serve(request)
-                    .also { resposeList.add(it) }
             }
             else -> {
                 println("mock 404")
                 MockResponse()
                     .setStatus("404")
-                    .also { resposeList.add(it) }
             }
         }
     }
 
     fun poolResponse() : MockResponse{
-        var response = resposeList.firstOrNull()
+        var response = responseList.firstOrNull()
         var tries = 0
         while(response == null) {
-            Thread.sleep(20)
-            response = resposeList.firstOrNull()
+            Thread.sleep(50)
+            response = responseList.firstOrNull()
             tries++
             if(tries > 15) {
                 throw AssertionError("Test was not able to retrieve a response in time")
             }
         }
         println("pooling tries $tries")
-        return response.also { resposeList.removeAt(0) }
+        return response.also { responseList.removeAt(0) }
     }
 
     @Suppress("UNUSED")
     fun clearResponseList() {
-        resposeList.clear()
+        responseList.clear()
     }
 }
