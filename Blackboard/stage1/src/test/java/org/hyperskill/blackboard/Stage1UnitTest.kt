@@ -28,16 +28,16 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
     }
 
     private val submitBtn: Button by lazy {
-        val view = activity.findViewByString<Button>("submitBtn")
+        val view = activity.findViewByString<Button>("loginBtn")
         view
     }
 
     private val usernameEt: EditText by lazy {
-        activity.findViewByString("usernameEt")
+        activity.findViewByString("loginUsernameEt")
     }
 
     private val passEt: EditText by lazy {
-        activity.findViewByString("passEt")
+        activity.findViewByString("loginPassEt")
     }
 
     val moshi = Moshi.Builder()
@@ -71,7 +71,7 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
 
         testActivity(arguments = arg) {
-            val user = MockUserDatabase.users["George"]!!
+            val user = MockUserDatabase.users["Lucas"]!!
 
             usernameEt.setText(user.userName)
             passEt.setText(user.plainPass)
@@ -79,7 +79,7 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
             val request = mockWebServer.takeRequest()
             assertEquals("Wrong request method", "POST", request.method)
-            assertEquals("Wrong request path", "/login/", request.path)
+            assertEquals("Wrong request path", "/login", request.path)
 
             val response = blackBoardMockBackEnd.poolResponse()
 
@@ -100,7 +100,6 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
                 }
 
                 assertEquals("Wrong login response", LoginResponse(user.token, user.role), loginResponse)
-
             }
         }
     }
