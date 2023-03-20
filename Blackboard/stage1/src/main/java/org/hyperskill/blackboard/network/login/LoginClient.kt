@@ -1,18 +1,17 @@
-package org.hyperskill.blackboard
+package org.hyperskill.blackboard.network.login
 
 import com.squareup.moshi.Moshi
-import okhttp3.Call
-import okhttp3.Callback
+import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.hyperskill.blackboard.request.LoginRequest
+import org.hyperskill.blackboard.network.login.dto.LoginRequest
+import org.hyperskill.blackboard.network.login.dto.LoginResponse
 
 class LoginClient(private val client: OkHttpClient, private val moshi: Moshi) {
 
 
-    var baseurl = "https://72ad1658-e2bb-4459-9ea2-6448fa833318.mock.pstmn.io"
+    var baseurl = "http://10.0.2.2:3001/"
 
     fun loginRequest(username: String, pass: String, callback: Callback): Call {
         return client.newCall(createLoginRequest(username, pass))
@@ -25,10 +24,17 @@ class LoginClient(private val client: OkHttpClient, private val moshi: Moshi) {
         val body = moshi.adapter(LoginRequest::class.java)
             .toJson(LoginRequest(username, pass))
             .toRequestBody(mediaType)
-
+        val url = baseurl.toHttpUrl().resolve("login")!!
+        println(url.toString())
         return Request.Builder()
-            .url("$baseurl/login")
+            .url(url)
             .post(body)
             .build()
+    }
+
+    fun parse(body: ResponseBody): LoginResponse {
+        return moshi.adapter(LoginResponse.Success::class.java)
+            .fromJson(body.source())
+            ?: LoginResponse.Fail("Server Error", 500)
     }
 }
