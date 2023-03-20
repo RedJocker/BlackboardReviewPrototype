@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import okhttp3.Call
 import okhttp3.Callback
-import org.hyperskill.blackboard.LoginClient
+import okhttp3.Response
+import org.hyperskill.blackboard.network.login.LoginClient
+import org.hyperskill.blackboard.network.login.dto.LoginResponse
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.*
@@ -26,6 +28,14 @@ class LoginViewModel(private val loginClient: LoginClient) : ViewModel() {
             call = null
         }
         super.onCleared()
+    }
+
+    fun toLoginResponse(response: Response): LoginResponse {
+        return if(response.code == 200) {
+            loginClient.parse(response.body!!)
+        } else {
+            LoginResponse.Fail(response.message, response.code)
+        }
     }
 
     class Factory(private val loginClient: LoginClient): ViewModelProvider.Factory {

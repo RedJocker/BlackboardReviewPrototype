@@ -11,6 +11,7 @@ import okhttp3.Callback
 import okhttp3.Response
 import org.hyperskill.blackboard.BlackboardApplication
 import org.hyperskill.blackboard.databinding.FragmentLoginBinding
+import org.hyperskill.blackboard.network.login.dto.LoginResponse
 import org.hyperskill.blackboard.util.Extensions.showToast
 import java.io.IOException
 
@@ -49,10 +50,11 @@ class LoginFragment : Fragment() {
 
     @Suppress("UNUSED_PARAMETER")
     private fun onLoginResponse(call: Call, response: Response) {
-        val body = response.body!!.string()
+        val loginResponse: LoginResponse = loginViewModel.toLoginResponse(response)
+
         activity?.runOnUiThread {
-            println("onResponse $body")
-            binding.helloTv.text = body
+            println("onResponse $loginResponse")
+            binding.helloTv.text = loginResponse.toString()
             //helloTv.text = "{\"tok\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVEVBQ0hFUiIsInN1YiI6Ikdlb3JnZSIsImlzcyI6ImJsYWNrQm9hcmRBcHAifQ.hY4fC9rkQniZMmSIREK9esqUpxK187gkEgJl4pgt_iA\", \"role\": \"TEACHER\", \"extra\": \"hey\"}"
         }
     }
