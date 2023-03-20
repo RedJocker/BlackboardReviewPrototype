@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import org.hyperskill.blackboard.BlackboardApplication
+import org.hyperskill.blackboard.R
 import org.hyperskill.blackboard.databinding.FragmentLoginBinding
 import org.hyperskill.blackboard.network.login.dto.LoginResponse
+import org.hyperskill.blackboard.network.login.dto.LoginResponse.Success.Companion.putLoginSuccess
 import org.hyperskill.blackboard.util.Extensions.showToast
 import java.io.IOException
 
@@ -56,6 +59,16 @@ class LoginFragment : Fragment() {
             println("onResponse $loginResponse")
             binding.helloTv.text = loginResponse.toString()
             //helloTv.text = "{\"tok\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVEVBQ0hFUiIsInN1YiI6Ikdlb3JnZSIsImlzcyI6ImJsYWNrQm9hcmRBcHAifQ.hY4fC9rkQniZMmSIREK9esqUpxK187gkEgJl4pgt_iA\", \"role\": \"TEACHER\", \"extra\": \"hey\"}"
+            when(loginResponse) {
+                is LoginResponse.Success -> {
+                    val args = Bundle().apply {
+                        putLoginSuccess(loginResponse)
+                    }
+                    findNavController()
+                        .navigate(R.id.action_loginFragment_to_studentFragment, args)
+                }
+                else -> {}
+            }
         }
     }
     @Suppress("UNUSED_PARAMETER")
