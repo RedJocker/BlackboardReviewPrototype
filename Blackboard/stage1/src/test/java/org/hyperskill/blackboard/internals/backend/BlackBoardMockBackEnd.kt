@@ -21,7 +21,7 @@ class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
 
     fun controller(request: RecordedRequest): MockResponse {
         return when (request.path) {
-            "/login/" -> {
+            "/login" -> {
                 loginService.serve(request)
             }
             else -> {
