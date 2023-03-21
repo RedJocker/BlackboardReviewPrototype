@@ -1,11 +1,13 @@
 package org.hyperskill.blackboard.ui.student
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import org.hyperskill.blackboard.BlackboardApplication
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.data.model.Credential.Companion.getCredential
 import org.hyperskill.blackboard.databinding.FragmentStudentBinding
@@ -14,7 +16,9 @@ import org.hyperskill.blackboard.util.Extensions.showToast
 class StudentFragment : Fragment() {
 
     private val studentViewModel: StudentViewModel by viewModels {
-        StudentViewModel.Factory()
+        val activity = requireActivity()
+        val application = activity.application as BlackboardApplication
+        StudentViewModel.Factory(application.studentClient, Handler(activity.mainLooper))
     }
     private lateinit var binding: FragmentStudentBinding
     lateinit var credentials: Credential
@@ -35,9 +39,20 @@ class StudentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            studentViewModel.grades.observe(viewLifecycleOwner) {
-                println("observe grades: $it")
-                studentGradesTempView.text = "Grades: $it"
+
+            studentViewModel.apply {
+                networkErrorMessage.observe(viewLifecycleOwner) {
+                    if(it.isNotBlank()) {
+                        println("error: $it")
+                        studentGradesTempView.text = "Error: $it"
+                    }
+
+                }
+                grades.observe(viewLifecycleOwner) {
+                    println("observe grades: $it")
+                    studentGradesTempView.text = "Grades: $it"
+                }
+
             }
 
             studentHelloButton.setOnClickListener {
