@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import org.hyperskill.blackboard.data.model.Credential
+import org.hyperskill.blackboard.data.model.Credential.Companion.getCredential
 import org.hyperskill.blackboard.databinding.FragmentStudentBinding
-import org.hyperskill.blackboard.network.login.dto.LoginResponse
-import org.hyperskill.blackboard.network.login.dto.LoginResponse.Success.Companion.getLoginSuccess
 import org.hyperskill.blackboard.util.Extensions.showToast
 
 class StudentFragment : Fragment() {
@@ -17,7 +17,7 @@ class StudentFragment : Fragment() {
         StudentViewModel.Factory()
     }
     private lateinit var binding: FragmentStudentBinding
-    lateinit var credentials: LoginResponse.Success
+    lateinit var credentials: Credential
 
 
 
@@ -25,21 +25,24 @@ class StudentFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        credentials = arguments!!.getCredential()
+        studentViewModel.fetchGrades(credentials)
         binding = FragmentStudentBinding.inflate(layoutInflater, container, false)
-        credentials = arguments!!.getLoginSuccess()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        studentViewModel.grades.observe(viewLifecycleOwner) {
-            println("observe grades: $it")
-            binding.studentGradesTempView.text = "Grades: $it"
-        }
+        binding.apply {
+            studentViewModel.grades.observe(viewLifecycleOwner) {
+                println("observe grades: $it")
+                studentGradesTempView.text = "Grades: $it"
+            }
 
-        binding.studentHelloButton.setOnClickListener {
-            context?.showToast("Hello $credentials")
+            studentHelloButton.setOnClickListener {
+                context?.showToast("Hello $credentials")
+            }
         }
     }
 }
