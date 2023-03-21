@@ -60,11 +60,19 @@ class LoginFragment : Fragment() {
             binding.helloTv.text = loginResponse.toString()
             when(loginResponse) {
                 is LoginResponse.Success -> {
-                    val args = Bundle().apply {
-                        putCredential(loginResponse.toCredential())
+                    when(loginResponse.role) {
+                        LoginResponse.Role.STUDENT -> {
+                            val args = Bundle().apply {
+                                putCredential(loginResponse.toCredential())
+                            }
+                            findNavController()
+                                .navigate(R.id.action_loginFragment_to_studentFragment, args)
+                        }
+                        LoginResponse.Role.TEACHER -> {
+
+                        }
                     }
-                    findNavController()
-                        .navigate(R.id.action_loginFragment_to_studentFragment, args)
+
                 }
                 else -> {}
             }
