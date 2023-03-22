@@ -4,14 +4,12 @@ import android.content.Intent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.mockwebserver.MockWebServer
 import org.hyperskill.blackboard.internals.AbstractUnitTest
 import org.hyperskill.blackboard.internals.backend.BlackBoardMockBackEnd
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
-import org.hyperskill.blackboard.internals.backend.dto.LoginResponse
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -71,7 +69,7 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
 
         testActivity(arguments = arg) {
-            val user = MockUserDatabase.users["Lucas"]!!
+            val user = MockUserDatabase.users["George"]!!
 
             usernameEt.setText(user.userName)
             passEt.setText(user.plainPass)
@@ -93,13 +91,11 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
                 println("after runToEndOfTasks")
 
                 val responseString = helloTv.text.toString()
-                val loginResponse = try {
-                    moshi.adapter(LoginResponse::class.java).fromJson(responseString)
-                } catch (e: JsonDataException) {
-                    throw AssertionError("Invalid response format for login. ${e.message?.dropLast(1)} $responseString")
-                }
+                println(responseString)
 
-                assertEquals("Wrong login response", LoginResponse(user.token, user.role), loginResponse)
+                val messageErrorLogin = "Wrong login response"
+                val expectedLoginResponse = "Success(username=George, token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVEVBQ0hFUiIsInN1YiI6Ikdlb3JnZSIsImlzcyI6ImJsYWNrQm9hcmRBcHAifQ.hY4fC9rkQniZMmSIREK9esqUpxK187gkEgJl4pgt_iA, role=TEACHER)"
+                assertEquals(messageErrorLogin, expectedLoginResponse, responseString)
             }
         }
     }

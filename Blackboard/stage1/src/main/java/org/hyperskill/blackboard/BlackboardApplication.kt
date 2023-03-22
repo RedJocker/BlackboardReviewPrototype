@@ -5,11 +5,16 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import org.hyperskill.blackboard.network.login.LoginClient
+import org.hyperskill.blackboard.network.student.StudentClient
 
 class BlackboardApplication: Application() {
 
     val loginClient by lazy {
         LoginClient(okHttpClient, moshi)
+    }
+
+    val studentClient by lazy {
+        StudentClient(okHttpClient, moshi)
     }
 
     private val okHttpClient by lazy {

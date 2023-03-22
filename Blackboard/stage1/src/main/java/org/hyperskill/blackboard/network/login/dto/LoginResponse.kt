@@ -1,22 +1,14 @@
 package org.hyperskill.blackboard.network.login.dto
 
-import android.os.Bundle
+import org.hyperskill.blackboard.data.model.Credential
 
 
-sealed class LoginResponse{
+sealed class LoginResponse {
 
-    data class Success(val token: String, val role: Role) : LoginResponse(){
+    data class Success(val username: String, val token: String, val role: Role) : LoginResponse(){
 
-        companion object {
-            fun Bundle.putLoginSuccess(loginSuccess: Success) {
-                putString("token", loginSuccess.token)
-                putString("role", loginSuccess.role.toString())
-            }
-            fun Bundle.getLoginSuccess(): Success {
-                val token = getString("token")!!
-                val role = Role.valueOf(getString("role")!!)
-                return Success(token, role)
-            }
+        fun toCredential(): Credential {
+            return Credential(username, token, role)
         }
     }
     data class Fail(val message: String, val code: Int) : LoginResponse()

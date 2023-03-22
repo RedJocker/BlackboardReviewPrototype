@@ -5,13 +5,11 @@ import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.hyperskill.blackboard.network.BaseClient
 import org.hyperskill.blackboard.network.login.dto.LoginRequest
 import org.hyperskill.blackboard.network.login.dto.LoginResponse
 
-class LoginClient(private val client: OkHttpClient, private val moshi: Moshi) {
-
-
-    var baseurl = "http://10.0.2.2:3001/"
+class LoginClient(client: OkHttpClient, moshi: Moshi): BaseClient(client, moshi) {
 
     fun loginRequest(username: String, pass: String, callback: Callback): Call {
         return client.newCall(createLoginRequest(username, pass))

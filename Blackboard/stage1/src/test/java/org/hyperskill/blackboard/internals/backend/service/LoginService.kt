@@ -5,6 +5,7 @@ import com.squareup.moshi.Types
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
+import org.hyperskill.blackboard.internals.backend.dto.LoginResponse
 
 class LoginService(val moshi: Moshi) {
 
@@ -40,10 +41,7 @@ class LoginService(val moshi: Moshi) {
                     user.base64sha256HashPass == requestPass -> { // Ok
                         println("mock 200")
                         MockResponse()
-                            .setBody("{" +
-                                    "\"token\": \"${user.token}\", " +
-                                    "\"role\": \"${user.role}\"" +
-                                    "}")
+                            .setBody(moshi.adapter(LoginResponse::class.java).toJson(user.toLoginResponse()))
                             .setResponseCode(200)
                             .addHeader("Content-Type", "application/json")
                     }

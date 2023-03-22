@@ -2,6 +2,7 @@ package org.hyperskill.blackboard.internals.backend.model
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import org.hyperskill.blackboard.internals.backend.dto.LoginResponse
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.*
@@ -22,4 +23,8 @@ class User(val userName: String, val role: String, val plainPass: String) {
         .withSubject(userName)
         .withClaim("ROLE", role)
         .sign(jwtAlg)
+
+    fun toLoginResponse() : LoginResponse {
+        return LoginResponse(userName, token, role)
+    }
 }
