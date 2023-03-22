@@ -30,17 +30,19 @@ class StudentViewModel(
     fun fetchGrades(credential: Credential) {
         fetchGradesCall = studentClient.fetchGrades(credential, callback(
             onFailure = ::onFetchGradesFailure,
-            onResponse = ::onFecthGradesResponse
+            onResponse = ::onFetchGradesResponse
         ))
     }
-    @Suppress("UNUSED_PARAMETER")
+
     private fun onFetchGradesFailure(call: Call, e: IOException) {
+        println(call)
         handler.post {
             _networkErrorMessage.value = e.message
         }
     }
-    @Suppress("UNUSED_PARAMETER")
-    private fun onFecthGradesResponse(call: Call, response: Response) {
+
+    private fun onFetchGradesResponse(call: Call, response: Response) {
+        println(call)
         handler.apply {
             println(response)
             when(response.code) {
