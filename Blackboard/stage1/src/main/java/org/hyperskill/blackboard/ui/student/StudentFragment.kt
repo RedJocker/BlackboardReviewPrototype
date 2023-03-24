@@ -52,7 +52,6 @@ class StudentFragment : Fragment() {
                     println("observe grades: $it")
                     studentGradesTempView.text = "Grades: $it"
                 }
-
             }
 
             studentHelloButton.setOnClickListener {

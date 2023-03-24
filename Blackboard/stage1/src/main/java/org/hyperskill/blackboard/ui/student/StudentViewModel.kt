@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.Response
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.network.student.StudentClient
+import org.hyperskill.blackboard.util.Util.callback
 import java.io.IOException
 
 
@@ -25,45 +25,47 @@ class StudentViewModel(
     val networkErrorMessage: LiveData<String>
         get() = _networkErrorMessage
 
-    var fetchGradesCall : Call? = null
+    private var fetchGradesCall : Call? = null
 
     fun fetchGrades(credential: Credential) {
-        fetchGradesCall = studentClient.fetchGrades(credential, object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                handler.post {
-                    _networkErrorMessage.value = e.message
-                }
+        fetchGradesCall = studentClient.fetchGrades(credential, callback(
+            onFailure = ::onFetchGradesFailure,
+            onResponse = ::onFetchGradesResponse
+        ))
+    }
 
-            }
+    private fun onFetchGradesFailure(call: Call, e: IOException) {
+        println(call)
+        handler.post {
+            _networkErrorMessage.value = e.message
+        }
+    }
 
-            override fun onResponse(call: Call, response: Response) {
-                handler.apply {
-                    println(response)
-                    when(response.code) {
-                        200 -> {
-                            val grades = studentClient.parseGrades(response.body)
-                            if(grades == null) {
-                                post {
-                                    _networkErrorMessage.value =
-                                        "server error, invalid response body ${response.body?.string()}"
-                                }
-                            } else {
-                                post {
-                                    _grades.value = grades
-                                }
-                            }
-
+    private fun onFetchGradesResponse(call: Call, response: Response) {
+        println(call)
+        handler.apply {
+            println(response)
+            when(response.code) {
+                200 -> {
+                    val grades = studentClient.parseGrades(response.body)
+                    if(grades == null) {
+                        post {
+                            _networkErrorMessage.value =
+                                "server error, invalid response body ${response.body?.string()}"
                         }
-                        else -> {
-                            post {
-                                _networkErrorMessage.value = "${response.code} ${response.message}"
-                            }
+                    } else {
+                        post {
+                            _grades.value = grades
                         }
                     }
                 }
+                else -> {
+                    post {
+                        _networkErrorMessage.value = "${response.code} ${response.message}"
+                    }
+                }
             }
-        })
-
+        }
     }
 
     class Factory(val studentClient: StudentClient, val handler: Handler): ViewModelProvider.Factory {
