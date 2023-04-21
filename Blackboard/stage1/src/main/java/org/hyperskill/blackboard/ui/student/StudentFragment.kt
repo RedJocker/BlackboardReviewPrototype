@@ -11,7 +11,6 @@ import org.hyperskill.blackboard.BlackboardApplication
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.data.model.Credential.Companion.getCredential
 import org.hyperskill.blackboard.databinding.FragmentStudentBinding
-import org.hyperskill.blackboard.util.Extensions.showToast
 
 class StudentFragment : Fragment() {
 
@@ -39,24 +38,22 @@ class StudentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-
+            val gradesRecyclerAdapter = GradesRecyclerAdapter(emptyList())
+            gradesRV.adapter = gradesRecyclerAdapter
+            studentNameTV.text = credentials.username
             studentViewModel.apply {
                 networkErrorMessage.observe(viewLifecycleOwner) {
                     if(it.isNotBlank()) {
                         println("error: $it")
-                        studentGradesTempView.text = "Error: $it"
+                        studentNameTV.error = "Error: $it"
                     }
 
                 }
-                grades.observe(viewLifecycleOwner) {
-                    println("observe grades: $it")
-                    studentGradesTempView.text = "Grades: $it"
+                grades.observe(viewLifecycleOwner) { gradesList ->
+                    println("observe grades: $gradesList")
+                    gradesRecyclerAdapter.grades = gradesList.map { "$it" }
+                    }
                 }
-            }
-
-            studentHelloButton.setOnClickListener {
-                context?.showToast("Hello $credentials")
-            }
         }
     }
 }
