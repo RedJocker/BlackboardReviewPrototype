@@ -38,7 +38,12 @@ class StudentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            val gradesRecyclerAdapter = GradesRecyclerAdapter(emptyList())
+            val gradesRecyclerAdapter = GradesRecyclerAdapter(
+                grades = emptyList(),
+                onPredictionGradesChanged = { predictionGrades ->
+                    studentViewModel.setPredictionGradesList(predictionGrades)
+                }
+            )
             gradesRV.adapter = gradesRecyclerAdapter
             studentNameTV.text = credentials.username
             studentViewModel.apply {
@@ -47,13 +52,15 @@ class StudentFragment : Fragment() {
                         println("error: $it")
                         studentNameTV.error = "Error: $it"
                     }
-
                 }
                 grades.observe(viewLifecycleOwner) { gradesList ->
                     println("observe grades: $gradesList")
-                    gradesRecyclerAdapter.grades = gradesList.map { "$it" }
-                    }
+                    gradesRecyclerAdapter.grades = gradesList
                 }
+                predictionGrades.observe(viewLifecycleOwner) { predictionGradesList ->
+                    println("observe predictionGrades $predictionGradesList")
+                }
+            }
         }
     }
 }

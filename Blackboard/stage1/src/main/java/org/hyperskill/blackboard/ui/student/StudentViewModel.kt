@@ -17,6 +17,10 @@ class StudentViewModel(
     private val studentClient: StudentClient, private val handler: Handler) : ViewModel() {
 
 
+    private var _predictionGrades: MutableLiveData<List<Int>> = MutableLiveData(listOf())
+    val predictionGrades: LiveData<List<Int>>
+        get() = _predictionGrades
+
     private val _grades: MutableLiveData<List<Int>> = MutableLiveData(listOf())
     val grades: LiveData<List<Int>>
         get() = _grades
@@ -32,6 +36,10 @@ class StudentViewModel(
             onFailure = ::onFetchGradesFailure,
             onResponse = ::onFetchGradesResponse
         ))
+    }
+
+    fun setPredictionGradesList(predictionGrades: List<Int>) {
+        _predictionGrades.value = predictionGrades
     }
 
     private fun onFetchGradesFailure(call: Call, e: IOException) {
