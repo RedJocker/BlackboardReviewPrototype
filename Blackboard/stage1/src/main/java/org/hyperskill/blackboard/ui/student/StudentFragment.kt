@@ -59,6 +59,12 @@ class StudentFragment : Fragment() {
                 }
                 predictionGrades.observe(viewLifecycleOwner) { predictionGradesList ->
                     println("observe predictionGrades $predictionGradesList")
+                    val result =
+                        if (predictionGradesList.isEmpty())
+                            0
+                        else
+                            predictionGradesList.sum() / predictionGradesList.size
+                    partialResultTV.text = "Partial Result: $result"
                 }
             }
         }
