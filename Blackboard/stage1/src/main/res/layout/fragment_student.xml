@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,29 +12,46 @@
     <TextView
         android:id="@+id/studentNameTV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="15"
+        android:layout_height="wrap_content"
+        android:paddingVertical="16dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/grades"
+
         />
 
-    <TextView
-        android:id="@+id/gradesLabel"
-        android:text="Grades:"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="10"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:gravity="bottom"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/gradesRV"
+    <LinearLayout
+        android:id="@+id/grades"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="50"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:orientation="horizontal"
-        />
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/studentNameTV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/gradesLabel"
+            android:text="Grades:"
+            android:paddingVertical="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/gradesRV"
+            android:paddingVertical="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+            />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/partialResultTV"
@@ -41,8 +59,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
+        app:layout_constraintTop_toBottomOf="@id/grades"
+        app:layout_constraintStart_toStartOf="parent"
         />
 
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
