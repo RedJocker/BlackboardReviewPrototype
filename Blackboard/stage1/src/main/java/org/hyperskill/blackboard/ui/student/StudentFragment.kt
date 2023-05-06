@@ -53,18 +53,29 @@ class StudentFragment : Fragment() {
                         studentNameTV.error = "Error: $it"
                     }
                 }
+
                 grades.observe(viewLifecycleOwner) { gradesList ->
                     println("observe grades: $gradesList")
                     gradesRecyclerAdapter.grades = gradesList
+                    setPredictionGradesList(gradesList.map { if(it < 0) 0 else it })
                 }
+
                 predictionGrades.observe(viewLifecycleOwner) { predictionGradesList ->
                     println("observe predictionGrades $predictionGradesList")
-                    val result =
-                        if (predictionGradesList.isEmpty())
+                    val partialGrade = grades.value?.let { grades ->
+                        if(grades.isEmpty())
+                            0
+                        else
+                            grades.sumOf { if (it < 0) 0 else it } / grades.size
+                    } ?: 0
+                    val partialGradePrediction =
+                        if(predictionGradesList.isEmpty())
                             0
                         else
                             predictionGradesList.sum() / predictionGradesList.size
-                    partialResultTV.text = "Partial Result: $result"
+                    val predictionString = if(partialGradePrediction == partialGrade) "" else " ($partialGradePrediction)"
+
+                    partialResultTV.text = "Partial Result: $partialGrade$predictionString"
                 }
             }
         }
