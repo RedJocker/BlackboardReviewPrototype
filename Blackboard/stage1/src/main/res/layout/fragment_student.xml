@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/grades"
-
+        app:layout_constraintVertical_chainStyle="spread"
         />
 
     <LinearLayout
@@ -29,6 +29,7 @@
         app:layout_constraintTop_toBottomOf="@id/studentNameTV"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/finals"
         android:orientation="vertical"
         >
 
@@ -53,15 +54,60 @@
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/partialResultTV"
-        android:text="Partial Result: %s"
+    <LinearLayout
+        android:id="@+id/finals"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="25"
-        app:layout_constraintTop_toBottomOf="@id/grades"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/grades"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        >
+
+        <TextView
+            android:id="@+id/partialResultTV"
+            android:text="Partial Result: %s"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/examLabel"
+                android:text="Exam:"
+                android:labelFor="@id/examET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                />
+
+            <EditText
+                android:text=""
+                android:id="@+id/examET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/finalResultTV"
+            android:text="Final Result: %s"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            />
+    </LinearLayout>
+
 
 
 

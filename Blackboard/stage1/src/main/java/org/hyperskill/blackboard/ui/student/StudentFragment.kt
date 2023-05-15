@@ -41,6 +41,7 @@ class StudentFragment : Fragment() {
             val gradesRecyclerAdapter = GradesRecyclerAdapter(
                 grades = emptyList(),
                 onPredictionGradesChanged = { predictionGrades ->
+                    println("onPredictionGradesChanged $predictionGrades")
                     studentViewModel.setPredictionGradesList(predictionGrades)
                 }
             )
