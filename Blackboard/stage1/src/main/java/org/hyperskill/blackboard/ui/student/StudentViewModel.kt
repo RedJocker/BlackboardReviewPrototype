@@ -23,6 +23,16 @@ class StudentViewModel(
     val grades: LiveData<List<Int>>
         get() = _grades
 
+    private var _predictionExamGrade: MutableLiveData<Int> = MutableLiveData(-1)
+    val predictionExamGrades: LiveData<Int>
+        get() = _predictionExamGrade
+
+    private var _examGrades: MutableLiveData<Int> = MutableLiveData(-1)
+    val examGrade: LiveData<Int>
+        get() = _examGrades
+
+
+
     val partialGrade = grades.map { grades ->
         if(grades.isEmpty())
             0
@@ -35,6 +45,19 @@ class StudentViewModel(
             0
         else
             predictionGradesList.sum() / predictionGradesList.size
+    }
+
+    val examGradesPredictionEnabledToValue =
+        examGrade.combineWith(predictionPartialGrade) { examGrade, predictionPartialGrade ->
+            if(examGrade == null || predictionPartialGrade == null) {
+                true to ""
+            } else if(examGrade > 0) {
+                false to "$examGrade"
+            } else if (predictionPartialGrade !in 30 until 70) {
+                false to ""
+            } else {
+                true to ""
+            }
     }
 
     val partialResult = partialGrade.combineWith(predictionPartialGrade) {partialGrade, predictionPartialGrade ->
@@ -57,6 +80,10 @@ class StudentViewModel(
 
     fun setPredictionGradesList(predictionGrades: List<Int>) {
         _predictionGrades.value = predictionGrades
+    }
+
+    fun setPredictionExamGrade(predictionExamGrade: Int) {
+        _predictionExamGrade.value = predictionExamGrade
     }
 
     private fun onFetchGradesFailure(call: Call, e: IOException) {

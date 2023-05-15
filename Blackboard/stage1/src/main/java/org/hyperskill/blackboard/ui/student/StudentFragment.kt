@@ -63,7 +63,25 @@ class StudentFragment : Fragment() {
 
                 partialResult.observe(viewLifecycleOwner) { partialResultString ->
                     println("observe partialResult: $partialResultString")
-                    binding.partialResultTV.text = partialResultString
+                    partialResultTV.text = partialResultString
+                }
+
+                examGradesPredictionEnabledToValue.observe(viewLifecycleOwner) { (isEtEnabled, predictionText) ->
+                    examET.apply {
+                        isEnabled = isEtEnabled
+                        setText(predictionText)
+                        if(isEtEnabled) {
+                            setOnEditorActionListener { _, _, _ ->
+                                val inputIntValue = text.toString().toIntOrNull() ?: -1
+                                val normalizedPredictionGrade = if(inputIntValue > 100) {
+                                    setText("100")
+                                    100
+                                } else inputIntValue
+                                setPredictionExamGrade(normalizedPredictionGrade)
+                                true
+                            }
+                        }
+                    }
                 }
             }
         }
