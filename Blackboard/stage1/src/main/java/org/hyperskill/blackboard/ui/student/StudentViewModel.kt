@@ -1,14 +1,12 @@
 package org.hyperskill.blackboard.ui.student
 
 import android.os.Handler
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import okhttp3.Call
 import okhttp3.Response
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.network.student.StudentClient
+import org.hyperskill.blackboard.util.Extensions.combineWith
 import org.hyperskill.blackboard.util.Util.callback
 import java.io.IOException
 
@@ -24,6 +22,25 @@ class StudentViewModel(
     private val _grades: MutableLiveData<List<Int>> = MutableLiveData(listOf())
     val grades: LiveData<List<Int>>
         get() = _grades
+
+    val partialGrade = grades.map { grades ->
+        if(grades.isEmpty())
+            0
+        else
+            grades.sumOf { if (it < 0) 0 else it } / grades.size
+    }
+
+    val predictionPartialGrade = predictionGrades.map { predictionGradesList ->
+        if(predictionGradesList.isEmpty())
+            0
+        else
+            predictionGradesList.sum() / predictionGradesList.size
+    }
+
+    val partialResult = partialGrade.combineWith(predictionPartialGrade) {partialGrade, predictionPartialGrade ->
+        val predictionString = if(predictionPartialGrade == partialGrade) "" else " ($predictionPartialGrade)"
+        "Partial Result: $partialGrade$predictionString"
+    }
 
     private val _networkErrorMessage: MutableLiveData<String> = MutableLiveData("")
     val networkErrorMessage: LiveData<String>

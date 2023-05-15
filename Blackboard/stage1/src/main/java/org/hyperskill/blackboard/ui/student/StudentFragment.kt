@@ -61,22 +61,9 @@ class StudentFragment : Fragment() {
                     setPredictionGradesList(gradesList.map { if(it < 0) 0 else it })
                 }
 
-                predictionGrades.observe(viewLifecycleOwner) { predictionGradesList ->
-                    println("observe predictionGrades $predictionGradesList")
-                    val partialGrade = grades.value?.let { grades ->
-                        if(grades.isEmpty())
-                            0
-                        else
-                            grades.sumOf { if (it < 0) 0 else it } / grades.size
-                    } ?: 0
-                    val partialGradePrediction =
-                        if(predictionGradesList.isEmpty())
-                            0
-                        else
-                            predictionGradesList.sum() / predictionGradesList.size
-                    val predictionString = if(partialGradePrediction == partialGrade) "" else " ($partialGradePrediction)"
-
-                    partialResultTV.text = "Partial Result: $partialGrade$predictionString"
+                partialResult.observe(viewLifecycleOwner) { partialResultString ->
+                    println("observe partialResult: $partialResultString")
+                    binding.partialResultTV.text = partialResultString
                 }
             }
         }
