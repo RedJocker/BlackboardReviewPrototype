@@ -24,45 +24,64 @@ class StudentViewModel(
         get() = _grades
 
     private var _predictionExamGrade: MutableLiveData<Int> = MutableLiveData(-1)
-    val predictionExamGrades: LiveData<Int>
+    val predictionExamGrade: LiveData<Int>
         get() = _predictionExamGrade
 
     private var _examGrades: MutableLiveData<Int> = MutableLiveData(-1)
     val examGrade: LiveData<Int>
         get() = _examGrades
 
-
-
     val partialGrade = grades.map { grades ->
         if(grades.isEmpty())
             0
         else
             grades.sumOf { if (it < 0) 0 else it } / grades.size
-    }
+    }.also { println("partialGrade ${it.value}") }
 
     val predictionPartialGrade = predictionGrades.map { predictionGradesList ->
         if(predictionGradesList.isEmpty())
             0
         else
             predictionGradesList.sum() / predictionGradesList.size
+    }.also { println("predictionPartialGrade ${it.value}") }
+
+    val finalGrade = partialGrade.combineWith(examGrade) { partial, exam ->
+        when {
+            partial == null -> null
+            exam == null -> partial
+            exam < 0 -> partial
+            else -> (partial + exam) / 2
+        }.also { println("finalGrade $it") }
+    }
+
+    val predictionFinalGrade = predictionPartialGrade.combineWith(predictionExamGrade) { partial, exam ->
+            when {
+                partial == null -> null
+                exam == null -> partial
+                exam < 0 -> partial
+                else -> (partial + exam) / 2
+            }.also { println("predictionFinalGrade $it") }
     }
 
     val examGradesPredictionEnabledToValue =
         examGrade.combineWith(predictionPartialGrade) { examGrade, predictionPartialGrade ->
-            if(examGrade == null || predictionPartialGrade == null) {
-                true to ""
-            } else if(examGrade > 0) {
-                false to "$examGrade"
-            } else if (predictionPartialGrade !in 30 until 70) {
-                false to ""
-            } else {
-                true to ""
-            }
+            when {
+                examGrade == null || predictionPartialGrade == null -> true to ""
+                examGrade > 0 -> false to "$examGrade"
+                predictionPartialGrade !in 30 until 70 -> false to ""
+                else -> true to ""
+            }.also { println("examGrade $it") }
     }
 
     val partialResult = partialGrade.combineWith(predictionPartialGrade) {partialGrade, predictionPartialGrade ->
         val predictionString = if(predictionPartialGrade == partialGrade) "" else " ($predictionPartialGrade)"
         "Partial Result: $partialGrade$predictionString"
+    }.also { println("partialResult ${it.value}") }
+
+    val finalResult = finalGrade.combineWith(predictionFinalGrade) { finalGrade, predictionFinalGrade ->
+        val predictionString = if(finalGrade == predictionFinalGrade) "" else " ($predictionFinalGrade)"
+        val finalGradeString = if(finalGrade != null) "$finalGrade" else ""
+        "Final Result: $finalGradeString$predictionString"
     }
 
     private val _networkErrorMessage: MutableLiveData<String> = MutableLiveData("")

@@ -68,8 +68,13 @@ class StudentFragment : Fragment() {
 
                 examGradesPredictionEnabledToValue.observe(viewLifecycleOwner) { (isEtEnabled, predictionText) ->
                     examET.apply {
+                        if(!isEtEnabled) {
+                            setText(predictionText)
+                            setPredictionExamGrade(-1)
+                        }
+
                         isEnabled = isEtEnabled
-                        setText(predictionText)
+
                         if(isEtEnabled) {
                             setOnEditorActionListener { _, _, _ ->
                                 val inputIntValue = text.toString().toIntOrNull() ?: -1
@@ -82,6 +87,10 @@ class StudentFragment : Fragment() {
                             }
                         }
                     }
+                }
+
+                finalResult.observe(viewLifecycleOwner) {
+                    finalResultTV.text = it
                 }
             }
         }
