@@ -1,20 +1,13 @@
 package org.hyperskill.blackboard.network.student
 
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.network.BaseClient
+import org.hyperskill.blackboard.network.student.dto.GradesResponse
 
 class StudentClient(client: OkHttpClient, moshi: Moshi): BaseClient(client, moshi) {
-
-    companion object {
-        val listIntType = Types.newParameterizedType(
-            List::class.java,
-            Integer::class.java,
-        )
-    }
 
     fun fetchGrades(credential: Credential, callback: Callback): Call {
         return client.newCall(fetchGradesRequest(credential)).also {
@@ -32,9 +25,13 @@ class StudentClient(client: OkHttpClient, moshi: Moshi): BaseClient(client, mosh
             .build()
     }
 
-    fun parseGrades(body: ResponseBody?): List<Int>? {
+    fun parseGrades(body: ResponseBody?): GradesResponse? {
         return body?.let {
-            moshi.adapter<List<Int>>(listIntType).fromJson(it.string())
+            moshi.adapter(GradesResponse.Success::class.java)
+                .fromJson(body.source())
+                ?: GradesResponse.Fail("Server Error", 500)
         }
+
+
     }
 }

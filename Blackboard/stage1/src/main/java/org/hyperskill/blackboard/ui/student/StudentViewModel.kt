@@ -6,6 +6,7 @@ import okhttp3.Call
 import okhttp3.Response
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.network.student.StudentClient
+import org.hyperskill.blackboard.network.student.dto.GradesResponse
 import org.hyperskill.blackboard.util.Extensions.combineWith
 import org.hyperskill.blackboard.util.Util.callback
 import java.io.IOException
@@ -118,15 +119,24 @@ class StudentViewModel(
             println(response)
             when(response.code) {
                 200 -> {
-                    val grades = studentClient.parseGrades(response.body)
-                    if(grades == null) {
+                    val gradesResponse = studentClient.parseGrades(response.body)
+                    if(gradesResponse == null || gradesResponse is GradesResponse.Fail) {
                         post {
                             _networkErrorMessage.value =
                                 "server error, invalid response body ${response.body?.string()}"
                         }
                     } else {
                         post {
-                            _grades.value = grades
+                            (gradesResponse as? GradesResponse.Success)?.also {
+
+                                _grades.value = if(it.exam > 0) {
+                                    it.grades.map { grade -> if(grade < 0) 0 else grade }
+                                } else {
+                                    it.grades
+                                }
+                                _examGrades.value = it.exam
+                                _predictionExamGrade.value = it.exam
+                            }
                         }
                     }
                 }
