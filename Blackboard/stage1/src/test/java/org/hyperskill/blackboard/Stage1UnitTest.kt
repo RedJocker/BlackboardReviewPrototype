@@ -1,17 +1,17 @@
 package org.hyperskill.blackboard
 
 import android.content.Intent
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.mockwebserver.MockWebServer
 import org.hyperskill.blackboard.internals.AbstractUnitTest
 import org.hyperskill.blackboard.internals.backend.BlackBoardMockBackEnd
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
+import org.hyperskill.blackboard.internals.screen.LoginScreen
+import org.hyperskill.blackboard.internals.screen.StudentScreen
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,24 +19,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
-
-    private val helloTv: TextView by lazy {
-        val view = activity.findViewByString<TextView>("helloTv")
-        view
-    }
-
-    private val submitBtn: Button by lazy {
-        val view = activity.findViewByString<Button>("loginBtn")
-        view
-    }
-
-    private val usernameEt: EditText by lazy {
-        activity.findViewByString("loginUsernameEt")
-    }
-
-    private val passEt: EditText by lazy {
-        activity.findViewByString("loginPassEt")
-    }
 
     val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
@@ -61,7 +43,7 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
     }
 
     @Test
-    fun testCorrectUsernamePasswordProduces200OkOnBackendResponse() {
+    fun testCorrectStudentLogin() {
 
         val arg = Intent().apply {
             putExtra("baseUrl", baseUrlMockWebServer)
@@ -69,33 +51,93 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
 
         testActivity(arguments = arg) {
-            val user = MockUserDatabase.users["George"]!!
+            val user = MockUserDatabase.users["Lucas"]!!
 
-            usernameEt.setText(user.userName)
-            passEt.setText(user.plainPass)
-            submitBtn.clickAndRun()
+            LoginScreen(this).apply {
+                usernameEt.setText(user.userName)
+                passEt.setText(user.plainPass)
+                submitBtn.clickAndRun()
+            }
 
             val request = mockWebServer.takeRequest()
             assertEquals("Wrong request method", "POST", request.method)
             assertEquals("Wrong request path", "/login", request.path)
 
-            val response = blackBoardMockBackEnd.poolResponse()
+            val loginResponse = blackBoardMockBackEnd.poolResponse()
 
-            if(response.status != "HTTP/1.1 200 OK") {
+            if(loginResponse.status != "HTTP/1.1 200 OK") {
                 throw AssertionError(
-                    "Wrong status '${response.status}' with body '${response.getBody()?.readUtf8()}'"
+                    "Wrong status '${loginResponse.status}' with body '${loginResponse.getBody()?.readUtf8()}'"
                 )
-            } else {
-                Thread.sleep(50)           // Callback.onResponse is async
-                shadowLooper.runToEndOfTasks()  // runOnUiThread goes to Handler queue
-                println("after runToEndOfTasks")
+            }
 
-                val responseString = helloTv.text.toString()
+            Thread.sleep(50)           // Callback.onResponse is async
+            shadowLooper.runToEndOfTasks()  // runOnUiThread goes to Handler queue
+            println("after runToEndOfTasks")
+
+            StudentScreen(this).apply {
+                val responseString = studentNameTV.text.toString()
                 println(responseString)
 
-                val messageErrorLogin = "Wrong login response"
-                val expectedLoginResponse = "Success(username=George, token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJST0xFIjoiVEVBQ0hFUiIsInN1YiI6Ikdlb3JnZSIsImlzcyI6ImJsYWNrQm9hcmRBcHAifQ.hY4fC9rkQniZMmSIREK9esqUpxK187gkEgJl4pgt_iA, role=TEACHER)"
+                val messageErrorLogin = "Wrong username found on studentNameTv"
+                val expectedLoginResponse = "Lucas"
                 assertEquals(messageErrorLogin, expectedLoginResponse, responseString)
+            }
+
+        }
+    }
+
+    @Test
+    fun testStudentNetworkFail() {
+        val arg = Intent().apply {
+            putExtra("baseUrl", baseUrlMockWebServer)
+        }
+
+
+        testActivity(arguments = arg) {
+            val user = MockUserDatabase.users["Martin"]!!
+
+            LoginScreen(this).apply {
+                usernameEt.setText(user.userName)
+                passEt.setText(user.plainPass)
+                submitBtn.clickAndRun()
+            }
+
+
+            val request = mockWebServer.takeRequest()
+            assertEquals("Wrong request method", "POST", request.method)
+            assertEquals("Wrong request path", "/login", request.path)
+
+            val loginResponse = blackBoardMockBackEnd.poolResponse()
+
+            if(loginResponse.status != "HTTP/1.1 200 OK") {
+                throw AssertionError(
+                    "Wrong status '${loginResponse.status}' with body '${loginResponse.getBody()?.readUtf8()}'"
+                )
+            }
+
+            Thread.sleep(50)           // Callback.onResponse is async
+            shadowLooper.runToEndOfTasks()  // runOnUiThread goes to Handler queue
+            println("after runToEndOfTasks")
+
+            val gradesResponse = blackBoardMockBackEnd.poolResponse()
+            println(gradesResponse)
+
+            StudentScreen(this).apply {
+                val responseString = studentNameTV.text.toString()
+                println(responseString)
+
+                val messageErrorLogin = "Wrong username found on studentNameTv"
+                val expectedLoginResponse = "Martin"
+                assertEquals(messageErrorLogin, expectedLoginResponse, responseString)
+
+                val error = studentNameTV.error.toString()
+                val messageErrorMessage = "Expected error message on studentNameTv"
+                assertEquals(messageErrorMessage, "Error: 504 Gateway Timeout", error)
+
+                assertTrue(studentNameTV.isFocusable)
+                assertTrue(studentNameTV.isFocusableInTouchMode)
+                assertTrue(studentNameTV.hasFocus())
             }
         }
     }

@@ -7,7 +7,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
 import org.hyperskill.blackboard.internals.backend.dto.LoginResponse
 
-class LoginService(val moshi: Moshi) {
+class LoginService(val moshi: Moshi): Service {
 
     val mapType = Types.newParameterizedType(
         Map::class.java,
@@ -15,7 +15,7 @@ class LoginService(val moshi: Moshi) {
         String::class.java
     )
 
-    fun serve(request: RecordedRequest): MockResponse {
+    override fun serve(request: RecordedRequest): MockResponse {
 
         if(request.method == "POST") {
             val bodyString = request.body.readUtf8()

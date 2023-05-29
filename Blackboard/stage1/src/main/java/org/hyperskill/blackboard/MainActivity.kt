@@ -12,6 +12,5 @@ class MainActivity : AppCompatActivity() {
         println("onCreate")
         BaseClient.baseurl = intent.extras?.getString("baseUrl") ?: BaseClient.baseurl
         println("baseUrl : ${BaseClient.baseurl}")
-
     }
 }

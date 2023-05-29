@@ -28,3 +28,11 @@ files:
   visible: false
 - name: src/main/java/org/hyperskill/blackboard/network/student/dto/GradesResponse.kt
   visible: true
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/service/StudentService.kt
+  visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/service/Service.kt
+  visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/screen/LoginScreen.kt
+  visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/screen/StudentScreen.kt
+  visible: false

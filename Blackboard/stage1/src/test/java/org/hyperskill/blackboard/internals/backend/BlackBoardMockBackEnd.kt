@@ -5,11 +5,13 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.hyperskill.blackboard.internals.backend.service.LoginService
+import org.hyperskill.blackboard.internals.backend.service.StudentService
 
 class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
 
 
     private val loginService = LoginService(moshi)
+    private val studentService = StudentService(moshi)
     private val responseList = mutableListOf<MockResponse>()
 
     override fun dispatch(request: RecordedRequest): MockResponse {
@@ -20,9 +22,12 @@ class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
     }
 
     fun controller(request: RecordedRequest): MockResponse {
-        return when (request.path) {
-            "/login" -> {
+        return when {
+            request.path == "/login" -> {
                 loginService.serve(request)
+            }
+            request.path?.startsWith("/student") ?: false -> {
+                studentService.serve(request)
             }
             else -> {
                 println("mock 404")
