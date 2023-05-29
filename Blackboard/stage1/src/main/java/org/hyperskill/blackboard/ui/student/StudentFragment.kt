@@ -52,6 +52,13 @@ class StudentFragment : Fragment() {
                     if(it.isNotBlank()) {
                         println("error: $it")
                         studentNameTV.error = "Error: $it"
+                        studentNameTV.isFocusableInTouchMode = true
+                        studentNameTV.isFocusable = true
+                        studentNameTV.requestFocus()
+
+
+                    } else {
+                        studentNameTV.error = null
                     }
                 }
 
