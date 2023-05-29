@@ -4,11 +4,11 @@ import com.squareup.moshi.Moshi
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
+import org.hyperskill.blackboard.internals.backend.response.Response
 import org.hyperskill.blackboard.internals.backend.service.LoginService
 import org.hyperskill.blackboard.internals.backend.service.StudentService
 
 class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
-
 
     private val loginService = LoginService(moshi)
     private val studentService = StudentService(moshi)
@@ -16,28 +16,19 @@ class BlackBoardMockBackEnd(moshi: Moshi) : Dispatcher() {
 
     override fun dispatch(request: RecordedRequest): MockResponse {
         println("dispatch $request")
-        return controller(request).also {
-            responseList.add(it)
-        }
+        return controller(request).also { responseList.add(it) }
     }
 
     fun controller(request: RecordedRequest): MockResponse {
         return when {
-            request.path == "/login" -> {
-                loginService.serve(request)
-            }
-            request.path?.startsWith("/student") ?: false -> {
-                studentService.serve(request)
-            }
-            else -> {
-                println("mock 404")
-                MockResponse()
-                    .setStatus("404")
-            }
+            request.path == null -> Response.badRequest400
+            request.path == "/login" -> loginService.serve(request)
+            request.path?.startsWith("/student") ?: false -> studentService.serve(request)
+            else -> Response.notFound404
         }
     }
 
-    fun poolResponse() : MockResponse{
+    fun poolResponse() : MockResponse {
         var response = responseList.firstOrNull()
         var tries = 0
         while(response == null) {

@@ -11,7 +11,6 @@ class LoginScreen(private val test : Stage1UnitTest) {
         activity.findViewByString<TextView>("helloTv")
     }
 
-
     val submitBtn: Button = with(test) {
         activity.findViewByString<Button>("loginBtn")
     }

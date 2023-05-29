@@ -7,7 +7,13 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.*
 
-class User(val userName: String, val role: String, val plainPass: String) {
+open class User(val userName: String, val role: String, val plainPass: String) {
+
+    object Role {
+        const val ROLE_TEACHER = "TEACHER"
+        const val ROLE_STUDENT = "STUDENT"
+    }
+
     companion object {
         private val messageDigest = MessageDigest.getInstance("SHA-256")
     }

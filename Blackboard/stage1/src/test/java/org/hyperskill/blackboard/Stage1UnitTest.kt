@@ -7,6 +7,8 @@ import okhttp3.mockwebserver.MockWebServer
 import org.hyperskill.blackboard.internals.AbstractUnitTest
 import org.hyperskill.blackboard.internals.backend.BlackBoardMockBackEnd
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
+import org.hyperskill.blackboard.internals.backend.model.Grades
+import org.hyperskill.blackboard.internals.backend.model.Student
 import org.hyperskill.blackboard.internals.screen.LoginScreen
 import org.hyperskill.blackboard.internals.screen.StudentScreen
 import org.junit.After
@@ -51,7 +53,9 @@ class Stage1UnitTest : AbstractUnitTest<MainActivity>(MainActivity::class.java){
 
 
         testActivity(arguments = arg) {
-            val user = MockUserDatabase.users["Lucas"]!!
+            val user = (MockUserDatabase.users["Lucas"] as Student).apply {
+                grades = Grades(listOf(100, 100, 100, 100), -1)
+            }
 
             LoginScreen(this).apply {
                 usernameEt.setText(user.userName)

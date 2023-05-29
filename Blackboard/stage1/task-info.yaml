@@ -36,3 +36,9 @@ files:
   visible: false
 - name: src/test/java/org/hyperskill/blackboard/internals/screen/StudentScreen.kt
   visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/response/Response.kt
+  visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/model/Student.kt
+  visible: false
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/model/Grades.kt
+  visible: false

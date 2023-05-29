@@ -6,6 +6,8 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.hyperskill.blackboard.internals.backend.database.MockUserDatabase
 import org.hyperskill.blackboard.internals.backend.dto.LoginResponse
+import org.hyperskill.blackboard.internals.backend.response.Response
+import org.hyperskill.blackboard.internals.backend.response.Response.withBody
 
 class LoginService(val moshi: Moshi): Service {
 
@@ -15,9 +17,10 @@ class LoginService(val moshi: Moshi): Service {
         String::class.java
     )
 
-    override fun serve(request: RecordedRequest): MockResponse {
+    val responseAdapter = moshi.adapter(LoginResponse::class.java)
 
-        if(request.method == "POST") {
+    override fun serve(request: RecordedRequest): MockResponse {
+        return if (request.method == "POST") {
             val bodyString = request.body.readUtf8()
             val mapBody = moshi.adapter<Map<String, String>>(mapType).fromJson(bodyString)
             println(mapBody)
@@ -25,38 +28,18 @@ class LoginService(val moshi: Moshi): Service {
             val requestPass = mapBody?.get("pass")
             val username = mapBody?.get("username")
 
-            if (requestPass == null || username == null) { // Bad Request
-                println("mock 400")
-                return MockResponse()
-                    .setResponseCode(400)
-            }
-            else {
-                val user = MockUserDatabase.users[username]
-                return when {
-                    user == null -> {
-                        println("mock 404") // Not Found
-                        MockResponse()
-                            .setStatus("404")
-                    }
-                    user.base64sha256HashPass == requestPass -> { // Ok
-                        println("mock 200")
-                        MockResponse()
-                            .setBody(moshi.adapter(LoginResponse::class.java).toJson(user.toLoginResponse()))
-                            .setResponseCode(200)
-                            .addHeader("Content-Type", "application/json")
-                    }
-                    else -> {
-                        println("mock 401")
-                        MockResponse()
-                            .setBody("Wrong pass $requestPass")
-                            .setStatus("HTTP/1.1 401 Unauthorized")
-                    }
+            if (requestPass == null || username == null) {
+                Response.badRequest400
+            } else MockUserDatabase.users[username].let { user ->
+                when {
+                    user == null ->
+                        Response.notFound404
+                    user.base64sha256HashPass == requestPass ->
+                        Response.ok200.withBody(responseAdapter.toJson(user.toLoginResponse()))
+                    else ->
+                        Response.unauthorized401
                 }
             }
-        }
-
-        println("mock 404") // Not Found
-        return MockResponse()
-            .setStatus("404")
+        } else { Response.notFound404 }
     }
 }
