@@ -31,7 +31,5 @@ class StudentClient(client: OkHttpClient, moshi: Moshi): BaseClient(client, mosh
                 .fromJson(body.source())
                 ?: GradesResponse.Fail("Server Error", 500)
         }
-
-
     }
 }

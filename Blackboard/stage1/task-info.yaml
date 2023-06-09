@@ -42,3 +42,31 @@ files:
   visible: false
 - name: src/test/java/org/hyperskill/blackboard/internals/backend/model/Grades.kt
   visible: false
+- name: src/main/res/layout/fragment_teacher.xml
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/TeacherFragment.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/StudentsRecyclerAdapter.kt
+  visible: true
+- name: src/main/res/layout/fragment_teacher_student_details.xml
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/TeacherViewModel.kt
+  visible: true
+- name: src/test/java/org/hyperskill/blackboard/internals/backend/model/Teacher.kt
+  visible: false
+- name: src/main/java/org/hyperskill/blackboard/network/teacher/TeacherClient.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/network/teacher/dto/StudentsResponse.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/data/model/Student.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/details/TeacherStudentDetailsFragment.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/details/TeacherStudentDetailsViewModel.kt
+  visible: true
+- name: src/main/res/layout/student_detail.xml
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/ui/teacher/details/TeacherGradesStudentAdapter.kt
+  visible: true
+- name: src/main/java/org/hyperskill/blackboard/network/teacher/dto/GradeUpdateRequest.kt
+  visible: true

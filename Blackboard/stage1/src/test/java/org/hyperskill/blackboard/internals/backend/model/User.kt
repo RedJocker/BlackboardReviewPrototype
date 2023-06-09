@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.*
 
-open class User(val userName: String, val role: String, val plainPass: String) {
+abstract class User(val userName: String, val role: String, val plainPass: String) {
 
     object Role {
         const val ROLE_TEACHER = "TEACHER"

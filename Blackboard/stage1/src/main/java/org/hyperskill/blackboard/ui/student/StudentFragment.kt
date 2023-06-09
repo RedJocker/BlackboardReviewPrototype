@@ -11,6 +11,7 @@ import org.hyperskill.blackboard.BlackboardApplication
 import org.hyperskill.blackboard.data.model.Credential
 import org.hyperskill.blackboard.data.model.Credential.Companion.getCredential
 import org.hyperskill.blackboard.databinding.FragmentStudentBinding
+import org.hyperskill.blackboard.databinding.StudentDetailBinding
 
 class StudentFragment : Fragment() {
 
@@ -19,10 +20,9 @@ class StudentFragment : Fragment() {
         val application = activity.application as BlackboardApplication
         StudentViewModel.Factory(application.studentClient, Handler(activity.mainLooper))
     }
-    private lateinit var binding: FragmentStudentBinding
+
+    private lateinit var detailBinding: StudentDetailBinding
     lateinit var credentials: Credential
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,14 +30,15 @@ class StudentFragment : Fragment() {
     ): View {
         credentials = arguments!!.getCredential()
         studentViewModel.fetchGrades(credentials)
-        binding = FragmentStudentBinding.inflate(layoutInflater, container, false)
+        val binding = FragmentStudentBinding.inflate(layoutInflater, container, false)
+        detailBinding = StudentDetailBinding.bind(binding.root)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.apply {
+        detailBinding.apply {
             val gradesRecyclerAdapter = GradesRecyclerAdapter(
                 grades = emptyList(),
                 onPredictionGradesChanged = { predictionGrades ->

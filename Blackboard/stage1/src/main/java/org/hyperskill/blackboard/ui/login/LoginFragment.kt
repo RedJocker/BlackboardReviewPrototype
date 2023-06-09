@@ -52,19 +52,22 @@ class LoginFragment : Fragment() {
             }
             credential.observe(viewLifecycleOwner) { maybeCredential ->
                 maybeCredential?.also { credential ->
+                    val args = Bundle().apply {
+                        putCredential(credential)
+                    }
+
                     when(credential.role) {
                         Role.STUDENT -> {
-                            val args = Bundle().apply {
-                                putCredential(credential)
-                            }
-                            loginViewModel.clearCredential()
                             findNavController()
                                 .navigate(R.id.action_loginFragment_to_studentFragment, args)
                         }
                         Role.TEACHER -> {
-
+                            findNavController()
+                                .navigate(R.id.action_loginFragment_to_teacherFragment, args)
                         }
                     }
+
+                    loginViewModel.clearCredential()
                 }
             }
         }
